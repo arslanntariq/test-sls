@@ -1,0 +1,60 @@
+.zegsu-smiley-100:before {
+    content: "\1F4AF";
+}
+.zegsu-smiley-poo:before {
+    content: "\1F4A9";
+}
+.zegsu-smiley-ghost:before {
+    content: "\1F47B";
+}
+.zegsu-smiley-robot:before {
+    content: "\1F916";
+}
+.zegsu-smiley-monkey-no-see:before {
+    content: "\1F648";
+}
+.zegsu-smiley-monkey-no-hear:before {
+    content: "\1F649";
+}
+.zegsu-smiley-monkey-no-say:before {
+    content: "\1F64A";
+}
+.zegsu-smiley-collision:before {
+    content: "\1F4A5";
+}
+.zegsu-smiley-dizzy:before {
+    content: "\1F4AB";
+}
+.zegsu-smiley-drops:before {
+    content: "\1F4A6";
+}
+.zegsu-smiley-bomb:before {
+    content: "\1F4A3";
+}
+.zegsu-smiley-speech:before {
+    content: "\1F4AC";
+}
+.zegsu-smiley-ok-hand:before {
+    content: "\1F44C";
+}
+.zegsu-smiley-thumbs-up:before {
+    content: "\1F44D";
+}
+.zegsu-smiley-folded-hands:before {
+    content: "\1F64F";
+}
+.zegsu-smiley-eyes:before {
+    content: "\1F440";
+}
+.zegsu-smiley-beer-mugs:before {
+    content: "\1F37B";
+}
+.zegsu-smiley-fire:before {
+    content: "\1F525";
+}
+.zegsu-smiley-green-check:before {
+    content: "\2705";
+}
+.zegsu-sold-main {
+    margin: 5px 0;
+}

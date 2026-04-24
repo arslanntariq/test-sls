@@ -1,0 +1,22 @@
+wishlist-link .wk-button {
+  --icon-size: 18px;
+  --icon-stroke: black;
+  --icon-stroke-width: 1px;
+}
+
+wishlist-link .wk-bubble,
+wishlist-link .wk-dot {
+  background: black;
+  color: white;
+  font-size: calc(var(--wk-font-text-scale) * 60%);
+}
+
+wishlist-link .wk-bubble {
+  --size: 17px;
+  pointer-events: none;
+}
+
+wishlist-link .wk-dot {
+  --size: 10px;
+  pointer-events: none;
+}

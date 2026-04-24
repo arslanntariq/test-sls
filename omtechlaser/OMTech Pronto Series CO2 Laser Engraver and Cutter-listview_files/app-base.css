@@ -1,0 +1,149 @@
+/* Button */
+
+wk-button {
+  pointer-events: none;
+}
+
+.wk-button .wk-icon {
+  --size: var(--icon-size, 18px);
+  --fill: var(--icon-fill);
+  --stroke: var(--icon-stroke, black);
+  --stroke-width: var(--icon-stroke-width, 1px);
+}
+
+.wk-button {
+  position: relative;
+  appearance: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 auto;
+  text-decoration: none;
+  color: unset;
+  border-width: 1px;
+  border-color: currentColor;
+  border-style: none;
+  gap: 7px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wk-button:not(:disabled) {
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.wk-button:focus {
+  outline: none;
+}
+
+.wk-button.wk-full-width {
+  width: 100%;
+}
+
+.wk-button.wk-align-left {
+  margin-left: 0;
+}
+
+.wk-button.wk-align-content-left {
+  justify-content: left;
+}
+
+.wk-button.wk-align-right {
+  margin-right: 0;
+}
+
+.wk-button.wk-align-content-right {
+  justify-content: right;
+}
+
+/* Counter */
+
+.wk-counter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.wk-counter.wk-dot,
+.wk-counter.wk-bubble {
+  padding: 0;
+  height: var(--size);
+  min-width: var(--size);
+  border-radius: calc(var(--size) / 2);
+}
+
+.wk-counter.wk-brackets::before {
+  content: "(";
+}
+
+.wk-counter.wk-brackets::after {
+  content: ")";
+}
+
+/* Icon */
+
+.wk-icon {
+  --size: 18px;
+  --fill: currentColor;
+  --stroke: currentColor;
+  --stroke-width: 1.25px;
+
+  position: relative;
+}
+
+.wk-icon svg {
+  display: block;
+  position: static !important;
+  width: var(--size) !important;
+  height: var(--size) !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  pointer-events: none;
+  transition: none;
+}
+
+.wk-icon svg path {
+  fill: var(--fill, transparent);
+  stroke: var(--stroke, transparent);
+  stroke-width: var(--stroke-width);
+  transition: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.wk-icon .wk-spinner-svg {
+  animation: wk-rotate 1.4s linear infinite;
+}
+
+.wk-icon .wk-spinner-circle {
+  stroke-dasharray: 280;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  stroke: currentColor;
+  animation: wk-dash 1.4s ease-in-out infinite;
+}
+
+@keyframes wk-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes wk-dash {
+  0% {
+    stroke-dashoffset: 280;
+  }
+  50% {
+    stroke-dashoffset: 75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 280;
+    transform: rotate(450deg);
+  }
+}

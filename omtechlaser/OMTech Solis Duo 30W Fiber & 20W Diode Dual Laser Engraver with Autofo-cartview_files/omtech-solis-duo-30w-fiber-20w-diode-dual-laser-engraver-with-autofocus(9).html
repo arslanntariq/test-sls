@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!-- saved from url=(0189)https://omtech.com/web-pixels@d3247c33wb722d9c3p15888587md70c83b9/custom/web-pixel-35749953@1/sandbox/modern/products/omtech-solis-duo-30w-fiber-20w-diode-dual-laser-engraver-with-autofocus -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>OMTech Solis Duo 30W Fiber &amp; 20W Diode Dual Laser Engraver with Autofo</title>
+    <script src="./sd3247c33wb722d9c3p15888587md70c83b9m.js.download"></script>
+
+    <script type="text/javascript">
+  (function(shopify) {shopify.extend('WebPixel::Render', function(api) {
+var analytics=api.analytics,browser=api.browser,init=api.init;
+const ga4_id = 'G-837LQ6JD90'
+window.dataLayer = window.dataLayer || [];
+window.shopify_pixel = "enabled";
+
+var script = document.createElement('script');
+script.setAttribute('src', `https://www.googletagmanager.com/gtag/js?id=${ga4_id}`);
+script.setAttribute('async', '');
+document.head.appendChild(script);
+function gtag() { dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', ga4_id);
+console.log("init_gtag");
+console.log(window.shopify_pixel)
+
+
+analytics.subscribe("search_submitted", (event) => {
+  gtag("event", "search", { search_term: event.data.searchResult.query });
+  gtag("event", "view_search_results", {
+    search_term: event.data.searchResult.query,
+    items: []
+  })
+});
+
+analytics.subscribe("collection_viewed", (event) => {
+  gtag("event", "view_item_list", {
+    item_list_id: event.data.collection.id,
+    item_list_name: event.data.collection.title,
+    items: []
+  });
+});
+
+analytics.subscribe("product_added_to_cart", (event) => {
+
+  let totalPrice = event.data.cartLine.merchandise.price.amount * event.data.cartLine.quantity;
+  gtag("event", "add_to_cart", {
+    currency: event.data.cartLine.merchandise.price.currencyCode,
+    value: totalPrice.toFixed(2),
+    items: [
+      {
+        item_name: event.data.cartLine.merchandise.product.title,
+        item_id: event.data.cartLine.merchandise.sku,
+        item_variant: event.data.cartLine.merchandise.title,
+        currency: event.data.cartLine.merchandise.price.currencyCode,
+        item_brand: event.data.cartLine.merchandise.product.vendor,
+        price: event.data.cartLine.merchandise.price.amount,
+        quantity: event.data.cartLine.quantity
+      }
+    ]
+  });
+});
+
+function ga4CheckoutEvents(event) {
+  let checkout = event.data.checkout;
+  let lineItems = [];
+
+  for (const checkoutLineItem of event.data.checkout.lineItems) {
+    lineItems.push({
+      item_id: checkoutLineItem.variant.sku,
+      item_name: checkoutLineItem.title,
+      item_variant: checkoutLineItem?.variant.title,
+      currency: checkoutLineItem.variant.price.currencyCode,
+      item_brand: checkoutLineItem.variant.product.vendor,
+      price: checkoutLineItem.variant.price.amount,
+      quantity: checkoutLineItem.quantity
+    });
+  }
+
+  payload = {
+    currency: checkout.totalPrice.currencyCode,
+    value: checkout.totalPrice.amount,
+    items: lineItems
+  };
+
+  return payload;
+}
+
+analytics.subscribe("product_viewed", (event) => {
+  gtag("event", "view_item", {
+    currency: event.data.productVariant.price.currencyCode,
+    value: event.data.productVariant.price.amount,
+    items: [
+      {
+        item_id: event.data.productVariant.sku,
+        item_name: event.data.productVariant.product.title,
+        item_variant: event.data.productVariant.title,
+        currency: event.data.productVariant.price.currencyCode,
+        item_brand: event.data.productVariant.product.vendor,
+        price: event.data.productVariant.price.amount,
+      }
+    ]
+  });
+});
+
+analytics.subscribe("checkout_started", (event) => {
+  gtag("event", "begin_checkout", ga4CheckoutEvents(event));
+});
+
+analytics.subscribe("payment_info_submitted", (event) => {
+  gtag("event", "add_payment_info", ga4CheckoutEvents(event));
+});
+
+analytics.subscribe("checkout_completed", (event) => {
+  let payload = ga4CheckoutEvents(event);
+  let checkout = event.data.checkout;
+  payload.transaction_id = checkout.order?.id || checkout.token;
+  payload.shipping = checkout.shippingLine?.price.amount || checkout.shipping_line?.price.amount || 0;
+  payload.tax = checkout.totalTax?.amount || 0;
+  gtag("event", "purchase", payload);
+});
+
+
+});})(self.webPixelsManager.createShopifyExtend('35749953', 'custom'));
+
+</script>
+
+  <script src="./js(2)" async=""></script></head>
+  <body>
+
+</body></html>

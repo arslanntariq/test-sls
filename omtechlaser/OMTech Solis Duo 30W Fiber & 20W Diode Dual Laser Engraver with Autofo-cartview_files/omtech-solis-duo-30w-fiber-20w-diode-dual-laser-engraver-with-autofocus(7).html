@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- saved from url=(0189)https://omtech.com/web-pixels@d3247c33wb722d9c3p15888587md70c83b9/custom/web-pixel-21758017@2/sandbox/modern/products/omtech-solis-duo-30w-fiber-20w-diode-dual-laser-engraver-with-autofocus -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>OMTech Solis Duo 30W Fiber &amp; 20W Diode Dual Laser Engraver with Autofo</title>
+    <script src="./sd3247c33wb722d9c3p15888587md70c83b9m.js.download"></script>
+
+    <script type="text/javascript">
+  (function(shopify) {shopify.extend('WebPixel::Render', function(api) {
+var analytics=api.analytics,browser=api.browser,init=api.init;
+analytics.subscribe("checkout_completed", (event) => {
+  const gmc_script = document.createElement('script');
+  gmc_script.setAttribute('src', `https://apis.google.com/js/platform.js?onload=renderOptIn`);
+  gmc_script.setAttribute('async', '');
+  document.head.appendChild(gmc_script);
+  function convertDate(date) {
+    var yyyy = date.getFullYear().toString();
+    var mm = (date.getMonth() + 1).toString();
+    var dd = date.getDate().toString();
+    var mmChars = mm.split('');
+    var ddChars = dd.split('');
+    return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+  }
+  function getDate() {
+    var todaysDate = new Date();
+    return convertDate(todaysDate)
+  }
+
+  window.renderOptIn = function () {
+    window.gapi.load('surveyoptin', function () {
+      window.gapi.surveyoptin.render(
+        {
+          // REQUIRED FIELDS
+          "merchant_id": "245016177",
+          "order_id": event.data.checkout.order?.id || event.data.checkout.token,
+          "email": event.data.checkout.email,
+          "delivery_country": event.data.checkout.shippingAddress.countryCode,
+          "estimated_delivery_date": getDate(),
+        });
+    });
+  }
+});
+});})(self.webPixelsManager.createShopifyExtend('21758017', 'custom'));
+
+</script>
+
+  </head>
+  <body>
+
+</body></html>

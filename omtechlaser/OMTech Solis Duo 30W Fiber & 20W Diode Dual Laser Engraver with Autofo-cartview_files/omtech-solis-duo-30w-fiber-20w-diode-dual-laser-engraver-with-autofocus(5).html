@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!-- saved from url=(0189)https://omtech.com/web-pixels@d3247c33wb722d9c3p15888587md70c83b9/custom/web-pixel-17072193@2/sandbox/modern/products/omtech-solis-duo-30w-fiber-20w-diode-dual-laser-engraver-with-autofocus -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>OMTech Solis Duo 30W Fiber &amp; 20W Diode Dual Laser Engraver with Autofo</title>
+    <script async="" src="./mk42487381192385_v20253999999997.js.download"></script><script async="" src="./mkq.min.js.download"></script><script src="./sd3247c33wb722d9c3p15888587md70c83b9m.js.download"></script>
+
+    <script type="text/javascript">
+  (function(shopify) {shopify.extend('WebPixel::Render', function(api) {
+var analytics=api.analytics,browser=api.browser,init=api.init;
+  !function (w, o, s, r, p, k, e) { if (w.mkq) { return } p = w.mkq = function () { p.invokeFunc ? p.invokeFunc.apply(p, arguments) : p.qu.push(arguments) }; if (!w._mkq) { w._mkq = p } p.push = p; p.qu = []; k = o.createElement(s); k.async = !0; k.src = r; e = o.getElementsByTagName(s)[0]; e.parentNode.insertBefore(k, e) }(window, document, "script", "https://pixeltrack.clientgear.com/mkq.min.js");
+  mkq('init', '42487381192385');
+  mkq('track', 'PageView', {
+		title: document.title
+	});
+
+
+analytics.subscribe("checkout_completed", (event) => {
+    var ids = [];
+    var orderId = event.data.checkout.order.id;
+    var currency = event.data.checkout.currencyCode;
+    var total = event.data.checkout.totalPrice.amount;
+    try{
+      var checkout = event.data.checkout;
+      var lineItems = checkout.lineItems;
+      for(var i=0; i < lineItems.length; i++){
+        ids.push(lineItems[i].variant.sku);
+      }
+    }catch(e){
+      console.log(e)
+    }
+  
+    mkq('track', 'Purchase', {
+        currency: currency,
+        value: total,
+        order_id: orderId,
+        content_ids: ids
+    });
+})
+});})(self.webPixelsManager.createShopifyExtend('17072193', 'custom'));
+
+</script>
+
+  <script>!function(win,doc,tag,src,app,ele,root){if(win.wmkq){return}app=win.wmkq=function(){app.invokeFunc?app.invokeFunc.apply(app,arguments):app.qu.push(arguments)};app.push=app;app.qu=[];ele=doc.createElement(tag);ele.async=true;ele.src=src;root=doc.getElementsByTagName(tag)[0];root?root.parentNode.insertBefore(ele,root):doc.getElementsByTagName("head")[0].appendChild(ele)}(window,document,"script","https://pixeltrack.clientgear.com/mk42487381192385_v20253999999997.js?");</script></head>
+  <body>
+
+</body></html>

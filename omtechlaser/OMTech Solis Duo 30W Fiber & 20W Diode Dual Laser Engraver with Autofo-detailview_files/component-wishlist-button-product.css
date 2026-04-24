@@ -1,0 +1,70 @@
+wishlist-button-product {
+  --icon-size: 18px;
+  --icon-stroke: rgb(var(--wk-color-accent-1));
+  --icon-stroke-width: 1px;
+  --icon-fill: transparent;
+  --icon-offset-vertical: 0;
+  --button-background: none;
+  --button-border: none;
+  --button-color: rgb(var(--wk-color-outline-button-label));
+  --button-border-width: var(--wk-button-border-width);
+  --button-border-radius: var(--wk-button-border-radius);
+  --button-min-height: var(--wk-button-min-height);
+  --button-padding: 0 10px;
+  --button-margin-top: 0px;
+  --button-margin-bottom: 0px;
+  --button-max-width: auto;
+}
+
+wishlist-button-product .wk-button,
+wishlist-button-product .wk-button:hover {
+  min-height: var(--button-min-height);
+  padding: var(--button-padding);
+  margin-top: var(--button-margin-top);
+  margin-bottom: var(--button-margin-bottom);
+  color: var(--button-color);
+  background: var(--button-background);
+  border: var(--button-border);
+  border-radius: var(--button-border-radius);
+  gap: 7px;
+  box-shadow: none;
+  max-width: var(--button-max-width);
+  font-size: calc(var(--wk-font-text-scale) * 100%);
+  font-family: inherit;
+}
+
+wishlist-button-product .wk-button .wk-icon {
+  top: var(--icon-offset-vertical);
+}
+
+wishlist-button-product .wk-button.wk-selected {
+  --icon-fill: var(--icon-stroke);
+}
+
+wishlist-button-product .wk-floating {
+  z-index: 10;
+}
+
+wishlist-button-product .wk-floating .wk-button {
+  padding: 0;
+  margin: 0;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
+  box-shadow: none;
+  border: none;
+  background: none;
+}
+
+wishlist-button-product .wk-floating .wk-button::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 100%;
+  width: 48px;
+  height: 48px;
+  background: none;
+}

@@ -1,0 +1,473 @@
+var LexusFbAPP_URL = `https://lexusfbpixel.com/api/pixelGetFromDb?accountName=${Shopify.shop}`;
+
+console.log("LexusFb theme");
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+let addToCartEventTriggeredLexusfb = false;
+let viewProductEventTriggeredLexusfb = false;
+
+// Get Data from Cookies =================================================
+function getCookieValue(cookieName) {
+  const cookies = document.cookie.split('; ');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split('=');
+    if (name === cookieName) {
+      return decodeURIComponent(value); // Use decodeURIComponent to handle URL-encoded values
+    }
+  }
+
+  return null; // Return null if the cookie with the specified name is not found
+}
+
+// Get Pixels From DB ==============================================
+function getDbData() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', LexusFbAPP_URL, true);
+  xhr.onload = function update() {
+    if (this.readyState == 4 && this.status == 200) {
+      sessionStorage.setItem('lexusFbDbPixel', xhr.response);
+    }
+  };
+  xhr.send(null);
+}
+setTimeout(function () {
+  if (!sessionStorage.getItem('lexusFbDbPixel')) {
+    getDbData();
+  }
+}, 1000);
+
+var DbPixels = JSON.parse(sessionStorage.getItem('lexusFbDbPixel'));
+
+// Meta function ===============================================
+!function (f, b, e, v, n, t, s) {
+  if (f.fbq) return; n = f.fbq = function () {
+    n.callMethod ?
+      n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+  };
+  if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+  n.queue = []; t = b.createElement(e); t.async = !0;
+  t.src = v; s = b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t, s)
+}(window, document, 'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+
+// BASE CODE TEMPLATE:
+
+var now = new Date(); // date for pixel 
+var time = now.getTime();
+sessionStorage.setItem('lexusfbId', time)
+sessionStorage.setItem('lexusfbPageViewId', time)
+
+// Request General Data ==================================================
+var userData = {
+  "client_user_agent": window.location.origin
+};
+if (localStorage.getItem('fbPixeluserIp')) {
+  userData.client_ip_address = localStorage.getItem('fbPixeluserIp');
+}
+if (getCookieValue('_fbp') != null) {
+  userData.fbp = getCookieValue('_fbp')
+}
+if (getCookieValue('_fbc') != null) {
+  userData.fbc = getCookieValue('_fbc');
+}
+if (getCookieValue('c_user') != null) {
+  userData.fb_login_id = getCookieValue('c_user');
+}
+var requestData = {
+  // "event_time": time,
+  "event_source_url": window.location.origin,
+  // "action_source": "website",
+
+}
+
+// FB PageView Event ======================================================
+
+if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+  DbPixels[0].forEach(function (pixel) {
+    if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+      requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+    }
+    fbq('init', pixel.pixel_id);
+    fbq('trackSingle', pixel.pixel_id, 'PageView', requestData, {
+      eventID: "LexusFbPixel{page_viewed}" + sessionStorage.getItem('lexusfbPageViewId')
+    });
+  })
+  sessionStorage.setItem('lexusfbPageViewId', time)
+}
+
+// FB addToCart Event ============================================================
+if (!isSafari) {
+  (async function (ns, fetch) {
+    if (typeof fetch !== 'function') {
+      openReplacement();
+      return;
+    }
+    ns.fetch = async function () {
+      const response = fetch.apply(this, arguments);
+      response.then(res => {
+        // res.clone().json().then(data => console.log("response Data", data));
+        if ([
+          `${window.location.origin}/cart/add`,
+          `${window.location.origin}/cart/add.js`,
+          `${window.location.origin}/cart/update.js`,
+          `${window.location.origin}/cart/change.js`,
+        ].includes(res.url)) {
+          res.clone().json().then(data => {
+            // Calling Add to Cart (ATC) event
+            if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+              var requestData = {
+                "event_time": time,
+                "event_source_url": window.location.origin,
+                "action_source": "website",
+                "content_ids": data.id,
+                "content_type": "product_group",
+                "value": (data.final_price) / 100,
+                "currency": Shopify.currency.active,
+                // "contents": [{ "id": data.id, "quantity": data.quantity }],
+                "content_name": data.product_title != undefined ? data.product_title : "Default Title",
+                "num_items": data.quantity,
+              }
+              DbPixels[0].forEach(function (pixel) {
+                if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+                  requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+                }
+                if (pixel.type == "Entire Store" || ((pixel.type == "Tags" || pixel.type == "Collections") && (
+                (pixel.productIds && JSON.parse(pixel.productIds).includes(data.product_id.toString()))  ))) {
+                  fbq('init', pixel.pixel_id);
+                  fbq('trackSingle', pixel.pixel_id, 'AddToCart', requestData, {
+                    eventID: "LexusFbPixel{product_added_to_cart}" + sessionStorage.getItem('lexusfbId')
+                  });
+                }
+              })
+            }
+            sessionStorage.setItem('lexusfbId', time)
+          });
+        }
+      });
+      return response;
+    }
+  }(window, window.fetch));
+  const open = window.XMLHttpRequest.prototype.open;
+
+  async function openReplacement() {
+    this.addEventListener("load", function () {
+      if (["/cart/add.js", "/cart/add"].includes(this._url)) {
+        // Calling Add to Cart (ATC) event
+        addToCartEventTriggeredLexusfb = true;
+        if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+          var requestData = {
+            "event_time": time,
+            "event_source_url": window.location.origin,
+            "action_source": "website",
+            "content_ids": JSON.parse(this.response).id,
+            "content_type": "product_group",
+            "value": (JSON.parse(this.response).final_price) / 100,
+            "currency": Shopify.currency.active,
+            // "contents": [{ "id": JSON.parse(this.response).id, "quantity": JSON.parse(this.response).quantity }],
+            "content_name": JSON.parse(this.response).product_title != undefined ? JSON.parse(this.response).product_title : "Default Title",
+            "num_items": JSON.parse(this.response).quantity,
+          }
+          DbPixels[0].forEach(function (pixel) {
+            if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+              requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+            }
+            if (pixel.type == "Entire Store" || ((pixel.type == "Tags" || pixel.type == "Collections") && ((pixel.productIds && JSON.parse(pixel.productIds).includes(JSON.parse(this.response).product_id))))) {
+              fbq('init', pixel.pixel_id);
+              fbq('trackSingle', pixel.pixel_id, 'AddToCart', requestData, {
+                eventID: "LexusFbPixel{product_added_to_cart}" + sessionStorage.getItem('lexusfbId')
+              });
+            }
+          })
+        }
+        sessionStorage.setItem('lexusfbId', time)
+      }
+    });
+    return open.apply(this, arguments);
+  }
+  window.XMLHttpRequest.prototype.open = openReplacement;
+} else {
+  document.addEventListener('click', event => {
+    if (event.target.name == "add" || event.target.value == 'Add to cart') {
+      // Calling Add to Cart (ATC) event
+      if (addToCartEventTriggeredLexusfb == false) {
+        addToCartEventTriggeredLexusfb = true;
+        var requestData = {
+          "event_time": time,
+          "event_source_url": window.location.origin,
+          "action_source": "website",
+          "content_ids": sessionStorage.getItem('addToCartId'),
+          "content_type": "product_group",
+          "value": sessionStorage.getItem('addToCartValue'),
+          "currency": Shopify.currency.active,
+          // "contents": [{ "id": sessionStorage.getItem('addToCartId'), "quantity": "1" }],
+          "content_name": sessionStorage.getItem('addToCartTitle'),
+          "num_items": 1,
+        }
+        if (DbPixels[0].length != 0) {
+          DbPixels[0].forEach(function (pixel) {
+            if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+              requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+            }
+            if (pixel.type != "Entire Store" || ((pixel.type == "Tags" || pixel.type == "Collections") && ((pixel.productIds && JSON.parse(pixel.productIds).includes(sessionStorage.getItem('addToCartMainId')))))) {
+              fbq('init', pixel.pixel_id);
+              fbq('trackSingle', pixel.pixel_id, 'AddToCart', requestData, {
+                eventID: "LexusFbPixel{product_added_to_cart}" + sessionStorage.getItem('lexusfbId')
+              });
+            }
+          })
+        }
+        sessionStorage.setItem('lexusfbId', time)
+      }
+    }
+  });
+}
+
+// FB search Event======================================================================
+
+if (ShopifyAnalytics.meta.page.pageType == "searchresults") {
+  let searchString = new URL(location.href).searchParams.get('q')
+  if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+    var requestData = {
+      "search_string": searchString,
+      "event_time": time,
+      "event_source_url": window.location.origin,
+      "action_source": "website",
+    }
+    DbPixels[0].forEach(function (pixel) {
+      if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+        requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+      }
+      fbq('init', pixel.pixel_id);
+    })
+    fbq('trackSingle', pixel.pixel_id, 'Search', requestData, {
+      eventID: "LexusFbPixel{search_submitted}" + sessionStorage.getItem('lexusfbId')
+    });
+  }
+  sessionStorage.setItem('lexusfbId', time)
+}
+
+// FB Product Viewd Event =============================================================
+
+if (ShopifyAnalytics.meta.page.pageType == "product") {
+  if (viewProductEventTriggeredLexusfb == false) {
+    viewProductEventTriggeredLexusfb = true;
+    if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+      var requestData = {
+        "event_time": time,
+        "event_source_url": window.location.origin,
+        "action_source": "website",
+        'content_ids': [productId],
+        "content_type": "product_group",
+        'value': value,
+        "currency": Shopify.currency.active,
+        "contents": [{ "id": productId, "quantity": "1" }],
+        "content_name": productTitle,
+      }
+      DbPixels[0].forEach(function (pixel) {
+        if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+          requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+        }
+        if (pixel.type == "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && ((pixel.productIds && JSON.parse(pixel.productIds).includes(sessionStorage.getItem('addToCartMainId')))))) {
+          console.log(JSON.parse(pixel.productIds));
+          console.log(((pixel.productIds && JSON.parse(pixel.productIds).includes(sessionStorage.getItem('addToCartMainId')))));
+          fbq('init', pixel.pixel_id);
+          fbq('trackSingle', pixel.pixel_id, 'ViewContent', requestData, {
+            eventID: "LexusFbPixel{product_viewed}" + sessionStorage.getItem('lexusfbId')
+          });
+        }
+      })
+    }
+    sessionStorage.setItem('lexusfbId', time)
+  }
+}
+
+//FB Collection Viewd Event =======================================================
+
+if (ShopifyAnalytics.meta.page.pageType == "collection") {
+  let q = window.location.pathname.split("/")
+  if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+    var requestData = {
+      "event_time": time,
+      "event_source_url": window.location.origin,
+      "action_source": "website",
+      'content_ids': collectionProducts.map(item => item.id),
+      "content_type": "product_group",
+      "contents": collectionProducts,
+    }
+    DbPixels[0].forEach(function (pixel) {
+      var idsMatch = [];
+      if (pixel.productIds != null) {
+        idsMatch = collectionProducts.filter((item) => {
+          return JSON.parse(pixel.productIds).includes(item.productId);
+        });
+      }
+      if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+        requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+      }
+      if (pixel.type == "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && (pixel.productIds && idsMatch.length != 0 ))) {
+          fbq('init', pixel.pixel_id);
+          fbq('trackSingle', pixel.pixel_id, 'ViewCategory', requestData, {
+            eventID: "LexusFbPixel{collection_viewed}" + sessionStorage.getItem('lexusfbId')
+          });
+        }
+    })
+    sessionStorage.setItem('lexusfbId', time)
+  }
+}
+
+//  FB Cart View Event ================================================================
+
+if (ShopifyAnalytics.meta.page.pageType == 'cart') {
+  if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+    var requestData = {
+      "event_time": time,
+      "event_source_url": window.location.origin,
+      "action_source": "website",
+      "value": cartPrice,
+      "currency": Shopify.currency.active,
+      'content_ids': cartItems.map(item => item.id),
+      "content_type": "product_group",
+      "contents": cartItems,
+      "num_items": cartItems.reduce((sum, item) => sum + parseInt(item.quantity, 10), 0)
+    }
+    DbPixels[0].forEach(function (pixel) {
+      let idsMatch = [];
+      if (pixel.productIds != null) {
+        cartItems.map((item) => {
+          if (JSON.parse(pixel.productIds).includes(item.product_id)) {
+            idsMatch.push(item.product_id);
+          }
+        });
+      }
+      if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+        requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+      }
+      if (pixel.type == "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && (pixel.productIds && idsMatch.length != 0))) {
+          fbq('init', pixel.pixel_id);
+          fbq('trackSingle', pixel.pixel_id, 'ViewCart', requestData, {
+            eventID: "LexusFbPixel{cart_viewed}" + sessionStorage.getItem('lexusfbId')
+          });
+        }
+    })
+    sessionStorage.setItem('lexusfbId', time)
+  }
+}
+
+//FB Checkout started Event ==========================================================
+
+document.addEventListener('click', event => {
+  if (event.target.name == "checkout" || event.target.textContent == 'Checkout' || event.target.getAttribute('href') == "/checkout" || event.target.getAttribute('onclick') == "window.location='/checkout'" || event.target.getAttribute('name') == "checkout") {
+    if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+      if (ShopifyAnalytics.meta.page.pageType == 'cart') {
+        var requestData = {
+          // "event_time": time,
+          "event_source_url": window.location.origin,
+          "action_source": "website",
+          "value": cartPrice,
+          "currency": Shopify.currency.active,
+          'content_ids': cartItems.map(item => item.id),
+          "content_type": "product_group",
+          "contents": cartItems,
+          "num_items": cartItems.reduce((sum, item) => sum + parseInt(item.quantity, 10), 0)
+        }
+        DbPixels[0].forEach(function (pixel) {
+          var idsMatch = [];
+          if (pixel.productIds != null) {
+            cartItems.map((item) => {
+              if (JSON.parse(pixel.productIds).includes(item.product_id)) {
+                idsMatch.push(item.product_id);
+              }
+            });
+          }
+          if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+            requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+          }
+          if (pixel.type != "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && ((pixel.productIds && idsMatch.length != 0)))) {
+            fbq('init', pixel.pixel_id);
+            fbq('trackSingle', pixel.pixel_id, 'InitiateCheckout', requestData, {
+              eventID: "LexusFbPixel{checkout_started}" + sessionStorage.getItem('lexusfbId')
+            });
+          }
+        })
+      }
+      else {
+        var requestData = {
+          "event_time": time,
+          "event_source_url": window.location.origin,
+          "action_source": "website",
+          "value": sessionStorage.getItem('addToCartValue'),
+          "currency": Shopify.currency.active,
+          'content_ids': [sessionStorage.getItem('addToCartId')],
+          "content_type": "product_group",
+          "contents": [{
+            id: sessionStorage.getItem('addToCartId'), quantity: 1,
+            title: sessionStorage.getItem('addToCartTitle')
+          }],
+          "num_items": 1
+        }
+        DbPixels[0].forEach(function (pixel) {
+          var idsMatch = [];
+          if (pixel.productIds != null) {
+            cartItems.map((item) => {
+              if (JSON.parse(pixel.productIds).includes(item.product_id)) {
+                idsMatch.push(item.product_id);
+              }
+            });
+          }
+          if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+            requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+          }
+          if (pixel.type != "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && (pixel.productIds && JSON.parse(pixel.productIds).includes(sessionStorage.getItem('addToCartMainId')) ))) {
+            fbq('init', pixel.pixel_id);
+            fbq('trackSingle', pixel.pixel_id, 'InitiateCheckout', requestData, {
+              eventID: "LexusFbPixel{checkout_started}" + sessionStorage.getItem('lexusfbId')
+            });
+          }
+        })
+      }
+    }
+    sessionStorage.setItem('lexusfbId', time)
+  }
+});
+document.addEventListener('click', function (event) {
+  if (event.target.classList.contains('shopify-payment-button__button')) {
+    if (DbPixels[0].length != 0 && DbPixels[0] != []) {
+      var requestData = {
+        "event_time": time,
+        "event_source_url": window.location.origin,
+        "action_source": "website",
+        "value": sessionStorage.getItem('addToCartValue'),
+        "currency": Shopify.currency.active,
+        'content_ids': [sessionStorage.getItem('addToCartId')],
+        "content_type": "product_group",
+        "contents": [{
+          id: sessionStorage.getItem('addToCartId'), quantity: 1,
+          title: sessionStorage.getItem('addToCartTitle')
+        }],
+        "num_items": 1
+      }
+      DbPixels[0].forEach(function (pixel) {
+        if (pixel.utm_source !== undefined && pixel.utm_medium !== undefined && pixel.utm_campaign !== undefined) {
+          requestData.event_source_url = window.location.origin + "?utm_source=" + pixel.utm_source + "&utm_medium=" + pixel.utm_medium + "&utm_campaign=" + pixel.utm_campaign;
+        }
+        if (pixel.type == "Entire Store" || ((pixel.type == "Collections" || pixel.type == "Tags") && (pixel.productIds && JSON.parse(pixel.productIds).includes(sessionStorage.getItem('addToCartMainId')) ))) {
+          fbq('init', pixel.pixel_id);
+          fbq('trackSingle', pixel.pixel_id, 'InitiateCheckout', requestData, {
+            eventID: "LexusFbPixel{checkout_started}" + sessionStorage.getItem('lexusfbId')
+          });
+        }
+      })
+    }
+    sessionStorage.setItem('lexusfbId', time)
+  }
+});
+
+
+
+// Shopify.extend('WebPixel::Render', function(api) {
+//   var analytics=api.analytics,browser=api.browser,init=api.init;
+//    analytics.subscribe("product_viewed", async event => {
+//     console.log("this is product viewed", event);
+//    });
+  
+//   })

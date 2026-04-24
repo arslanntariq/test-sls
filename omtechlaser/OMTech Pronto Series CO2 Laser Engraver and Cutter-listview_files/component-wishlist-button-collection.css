@@ -1,0 +1,51 @@
+wishlist-button-collection .wk-button,
+wishlist-button-collection .wk-button:hover {
+  --icon-fill: transparent;
+
+  padding: 0;
+  margin: 0;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
+  gap: 7px;
+  box-shadow: none;
+  border: none;
+  background: none;
+  bottom: var(--button-offset-vertical);
+  left: var(--button-offset-horizontal);
+}
+
+wishlist-button-collection .wk-button.wk-selected {
+  --icon-fill: var(--icon-stroke, black);
+}
+
+wishlist-button-collection .wk-button::before,
+wishlist-button-collection .wk-button:hover::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: var(--button-background-border-radius);
+  width: var(--button-background-size);
+  height: var(--button-background-size);
+  background: var(--button-background);
+  border: var(--button-border);
+  box-shadow: var(--button-box-shadow);
+}
+
+wishlist-button-collection .wk-floating {
+  z-index: 9;
+}
+
+wishlist-button-collection .wk-icon svg {
+  position: static !important;
+  width: var(--size) !important;
+  height: var(--size) !important;
+}
+
+wishlist-button-collection .wk-button:hover {
+  animation: none;
+  box-shadow: none;
+}
