@@ -13,18 +13,20 @@
     style.textContent = `
       /* button */
       .expresslf-btn-wrapper {
-        margin: 10px 0;
-        text-align: left;
+        margin: 15px 0;
+        width: 100%;
       }
       .expresslf-btn {
-        display: inline-block;
-        background: #3B71E8;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        background: #f7801a; /* Orange default */
         color: #fff;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 15px;
         font-weight: 700;
         text-align: center;
-        padding: 12px 28px;
+        padding: 14px 28px;
         border-radius: 4px;
         border: none;
         cursor: pointer;
@@ -32,11 +34,10 @@
         text-decoration: none;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.15s ease, background 0.15s ease;
-        max-width: 100%;
       }
       .expresslf-btn:hover {
         transform: translateY(-1px);
-        background: #2b5ac2;
+        background: #3B71E8; /* Blue hover */
       }
       .expresslf-btn:active {
         transform: translateY(0);
@@ -49,10 +50,11 @@
       .expresslf-branding {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 5px;
-        margin-top: 6px;
-        font-size: 12px;
-        color: #555;
+        margin-top: 8px;
+        font-size: 13px;
+        color: #333;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       .expresslf-branding svg {
@@ -109,6 +111,7 @@
         height: 100vh;
         background: #fff;
         box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+        border-left: 3px solid #f7801a;
         display: flex;
         flex-direction: column;
         transition: right 0.3s ease;
@@ -117,36 +120,41 @@
         right: 0;
       }
       .expresslf-drawer-header {
+        position: relative;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        padding: 15px 20px;
+        padding: 18px 20px;
         border-bottom: 1px solid #eaeaea;
-        background: #fdfdfd;
+        background: #fff;
       }
       .expresslf-drawer-title {
         display: flex;
         align-items: center;
         gap: 8px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 13px;
-        color: #333;
+        font-size: 15px;
+        font-weight: 700;
+        color: #000;
       }
       #expresslf-close-btn {
-        font-size: 24px;
+        position: absolute;
+        right: 15px;
+        font-size: 22px;
+        font-weight: 900;
         line-height: 1;
         cursor: pointer;
         background: transparent;
         border: none;
-        color: #999;
+        color: #f7801a;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: color 0.15s ease;
+        transition: transform 0.15s ease;
         padding: 5px;
       }
       #expresslf-close-btn:hover {
-        color: #333;
+        transform: scale(1.1);
       }
       #expresslf-iframe {
         flex: 1;
@@ -224,7 +232,7 @@
     
     const title = document.createElement('div');
     title.className = 'expresslf-drawer-title';
-    title.innerHTML = 'Financing by ' + expressLogoSVG();
+    title.innerHTML = 'Simple business & vocational financing by ' + expressLogoSVG();
 
     const closeBtn = document.createElement('button');
     closeBtn.id = 'expresslf-close-btn';
@@ -500,7 +508,20 @@
     if (!isNaN(price) && price > 0 && title) {
       var btn = createButton(price, title, [title], false);
 
-      // try to drop it into the old Clicklease container
+      // 1. Try to place it exactly after the Add to Cart form (Shopify standard)
+      var addToCartForm = document.querySelector('form[action^="/cart/add"]') || document.querySelector('form.product-single__form');
+      if (addToCartForm) {
+        var formBlock = addToCartForm.closest('.product-block') || addToCartForm;
+        formBlock.parentNode.insertBefore(btn, formBlock.nextSibling);
+        console.log('[ExpressLF] Detail button injected after Add to Cart form');
+        
+        // Hide old clicklease button to prevent duplicates
+        var clickleaseBtn = document.querySelector('.ClickleaseButton');
+        if (clickleaseBtn) clickleaseBtn.style.display = 'none';
+        return;
+      }
+
+      // 2. Try the old Clicklease container as a fallback
       var clickleaseBtn = document.querySelector('.ClickleaseButton');
       if (clickleaseBtn) {
         clickleaseBtn.innerHTML = '';
@@ -509,7 +530,7 @@
         return;
       }
 
-      // otherwise stick it after the price block
+      // 3. Fallback to product price block
       var priceBlock = document.querySelector('.product-block--price');
       if (priceBlock && priceBlock.parentNode) {
         priceBlock.parentNode.insertBefore(btn, priceBlock.nextSibling);
@@ -517,7 +538,7 @@
         return;
       }
 
-      // or after the buy button
+      // 4. Fallback to buy-button block
       var buyBlock = document.querySelector('.product-block.buy-button');
       if (buyBlock && buyBlock.parentNode) {
         buyBlock.parentNode.insertBefore(btn, buyBlock.nextSibling);
