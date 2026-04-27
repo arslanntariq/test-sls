@@ -18,25 +18,25 @@
       }
       .expresslf-btn {
         display: inline-block;
-        background: linear-gradient(135deg, #e8891c 0%, #f0a040 100%);
+        background: #3B71E8;
         color: #fff;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 15px;
         font-weight: 700;
         text-align: center;
         padding: 12px 28px;
-        border-radius: 8px;
+        border-radius: 4px;
         border: none;
         cursor: pointer;
         line-height: 1.4;
         text-decoration: none;
-        box-shadow: 0 2px 8px rgba(232,137,28,0.25);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.15s ease, background 0.15s ease;
         max-width: 100%;
       }
       .expresslf-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(232,137,28,0.35);
+        background: #2b5ac2;
       }
       .expresslf-btn:active {
         transform: translateY(0);
@@ -82,65 +82,107 @@
         margin: 12px 0 8px;
       }
 
-      /* modal overlay */
+      /* modal overlay (now a side drawer) */
       #expresslf-modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
         opacity: 0;
-        transition: opacity 0.25s ease;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
       }
       #expresslf-modal-overlay.expresslf-visible {
         opacity: 1;
+        visibility: visible;
       }
       #expresslf-modal-container {
-        position: relative;
-        width: 90%;
-        max-width: 900px;
-        height: 85vh;
+        position: absolute;
+        top: 0;
+        right: -100%;
+        width: 500px;
+        max-width: 90vw;
+        height: 100vh;
         background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        transform: scale(0.95);
-        transition: transform 0.25s ease;
+        box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease;
       }
       #expresslf-modal-overlay.expresslf-visible #expresslf-modal-container {
-        transform: scale(1);
+        right: 0;
+      }
+      .expresslf-drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eaeaea;
+        background: #fdfdfd;
+      }
+      .expresslf-drawer-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 13px;
+        color: #333;
       }
       #expresslf-close-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 28px;
+        font-size: 24px;
         line-height: 1;
         cursor: pointer;
-        z-index: 100000;
-        background: rgba(255,255,255,0.9);
+        background: transparent;
         border: none;
-        color: #333;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
+        color: #999;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-        transition: background 0.15s ease;
+        transition: color 0.15s ease;
+        padding: 5px;
       }
       #expresslf-close-btn:hover {
-        background: #f0f0f0;
+        color: #333;
       }
       #expresslf-iframe {
+        flex: 1;
         width: 100%;
-        height: 100%;
         border: none;
+      }
+
+      /* vertical side tab */
+      #expresslf-vertical-tab {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background: #fff;
+        padding: 15px 6px;
+        border: 1px solid #eaeaea;
+        border-right: none;
+        border-radius: 6px 0 0 6px;
+        box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+        cursor: pointer;
+        z-index: 99998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-family: Arial, sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        color: #3B71E8;
+        letter-spacing: 1px;
+        transition: background 0.2s ease, padding-right 0.2s ease;
+      }
+      #expresslf-vertical-tab:hover {
+        background: #f9f9f9;
+        padding-right: 10px;
       }
 
       /* mobile */
@@ -176,10 +218,21 @@
     const container = document.createElement('div');
     container.id = 'expresslf-modal-container';
 
+    // Drawer header
+    const header = document.createElement('div');
+    header.className = 'expresslf-drawer-header';
+    
+    const title = document.createElement('div');
+    title.className = 'expresslf-drawer-title';
+    title.innerHTML = 'Financing by ' + expressLogoSVG();
+
     const closeBtn = document.createElement('button');
     closeBtn.id = 'expresslf-close-btn';
     closeBtn.innerHTML = '&#10005;';
-    closeBtn.setAttribute('aria-label', 'Close financing modal');
+    closeBtn.setAttribute('aria-label', 'Close financing drawer');
+
+    header.appendChild(title);
+    header.appendChild(closeBtn);
 
     const iframe = document.createElement('iframe');
     iframe.id = 'expresslf-iframe';
@@ -187,7 +240,7 @@
     iframe.setAttribute('title', 'ExpressLF Financing Application');
     iframe.setAttribute('allow', 'payment');
 
-    container.appendChild(closeBtn);
+    container.appendChild(header);
     container.appendChild(iframe);
     overlay.appendChild(container);
     document.body.appendChild(overlay);
@@ -635,6 +688,23 @@
     console.log('[ExpressLF] Cart drawer observer started on:', cartContainer.className || cartContainer.tagName);
   }
 
+  // -- inject vertical side tab --
+  function injectVerticalTab() {
+    if (document.getElementById('expresslf-vertical-tab')) return;
+
+    var tab = document.createElement('div');
+    tab.id = 'expresslf-vertical-tab';
+    tab.innerHTML = 'express'; // Can use SVG if preferred, text is simpler for vertical-rl
+    
+    tab.addEventListener('click', function() {
+      // Create a default url for the side tab
+      var url = buildUrl(0, 'Financing Application', ['Financing Application']);
+      openModal(url);
+    });
+
+    document.body.appendChild(tab);
+  }
+
   // -- kick it off --
   function init() {
     injectStyles();
@@ -647,6 +717,9 @@
 
     // cart drawer can slide in from any page, always listen
     handleCartDrawer();
+
+    // persistent side tab
+    injectVerticalTab();
 
     if (body.classList.contains('template-collection')) {
       handleListView();
